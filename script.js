@@ -25,38 +25,30 @@
     'about': 'About'
   };
 
+  const sectionLinks = {
+    'biography': 'index.html#biography',
+    'the-prince': 'theprince.html',
+    'the-mandrake': 'themandrake.html',
+    'discourses': 'texts.html',
+    'florence': 'florence.html',
+    'medici': 'medici.html',
+    'correspondence': 'correspondence.html',
+    'further-readings': 'readings.html',
+    'about': 'about.html'
+  };
+
   const sidebar = document.createElement('div');
   sidebar.id = 'section-sidebar';
   sections.forEach((section, i) => {
-    const label = document.createElement('div');
+    const label = document.createElement('a');
     label.className = 'section-label';
     label.dataset.index = i;
     label.textContent = sectionNames[section.id] || section.id;
-    label.addEventListener('click', () => {
-      section.scrollIntoView({ behavior: 'smooth' });
-    });
+    label.href = sectionLinks[section.id] || `#${section.id}`;
     sidebar.appendChild(label);
   });
   document.body.appendChild(sidebar);
   const sectionLabels = document.querySelectorAll('.section-label');
-
-  // navbar hide-on-scroll
-  const heroNav = document.getElementById('hero-nav');
-  let lastScrollY = 0;
-  function toggleNavbar() {
-    if (heroNav) {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 60) {
-        // scrolling down, hide navbar
-        heroNav.classList.add('hidden');
-      } else {
-        // scrolling up, show navbar
-        heroNav.classList.remove('hidden');
-      }
-      lastScrollY = currentScrollY;
-    }
-  }
-  window.addEventListener('scroll', toggleNavbar, { passive: true });
 
   // ── SECTION DETECTION ──────────────────────────────
   function updateCurrentSection() {
@@ -72,15 +64,6 @@
         break;
       }
     }
-
-    // Update nav bar active state
-    document.querySelectorAll('.nav-links a').forEach(link => {
-      link.classList.remove('active');
-      const href = link.getAttribute('href');
-      if (href === `#${currentSection.id}`) {
-        link.classList.add('active');
-      }
-    });
 
     // Update sidebar active state
     sectionLabels.forEach((label, i) => {
@@ -187,6 +170,7 @@
 
   function onWheel(e) {
     if (activeZoneIdx < 0) return;
+    if (e.target.closest && e.target.closest('.zoom-box')) return;
 
     const zs    = zoneState[activeZoneIdx];
     const delta = e.deltaY * WHEEL_SENSITIVITY;
