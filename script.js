@@ -25,30 +25,45 @@
     'about': 'About'
   };
 
-  const sectionLinks = {
-    'biography': 'index.html#biography',
-    'the-prince': 'theprince.html',
-    'the-mandrake': 'themandrake.html',
-    'discourses': 'texts.html',
-    'florence': 'florence.html',
-    'medici': 'medici.html',
-    'correspondence': 'correspondence.html',
-    'further-readings': 'readings.html',
-    'about': 'about.html'
-  };
-
   const sidebar = document.createElement('div');
   sidebar.id = 'section-sidebar';
   sections.forEach((section, i) => {
-    const label = document.createElement('a');
+    const label = document.createElement('div');
     label.className = 'section-label';
     label.dataset.index = i;
     label.textContent = sectionNames[section.id] || section.id;
-    label.href = sectionLinks[section.id] || `#${section.id}`;
+    label.addEventListener('click', () => {
+      section.scrollIntoView({ behavior: 'smooth' });
+    });
     sidebar.appendChild(label);
   });
   document.body.appendChild(sidebar);
   const sectionLabels = document.querySelectorAll('.section-label');
+
+  const hoverZone = document.createElement('div');
+  hoverZone.id = 'sidebar-hover-zone';
+  document.body.appendChild(hoverZone);
+
+  let isScrolled = false;
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      isScrolled = true;
+      sidebar.classList.add('hidden');
+    } else {
+      isScrolled = false;
+      sidebar.classList.remove('hidden');
+    }
+  }, { passive: true });
+
+  hoverZone.addEventListener('mouseenter', () => {
+    sidebar.classList.remove('hidden');
+  });
+
+  hoverZone.addEventListener('mouseleave', () => {
+    if (isScrolled) {
+      sidebar.classList.add('hidden');
+    }
+  });
 
   // ── SECTION DETECTION ──────────────────────────────
   function updateCurrentSection() {
@@ -170,7 +185,6 @@
 
   function onWheel(e) {
     if (activeZoneIdx < 0) return;
-    if (e.target.closest && e.target.closest('.zoom-box')) return;
 
     const zs    = zoneState[activeZoneIdx];
     const delta = e.deltaY * WHEEL_SENSITIVITY;

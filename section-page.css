@@ -1,0 +1,141 @@
+:root {
+  --page-bg-top: #ecd6a9;
+  --page-bg-bottom: #573022;
+  --card-bg: rgba(250, 243, 232, 0.86);
+  --card-line: rgba(86, 55, 31, 0.16);
+  --ink: #25170f;
+  --accent: #7c241f;
+  --accent-soft: rgba(124, 36, 31, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Spectral", Georgia, serif;
+  background:
+    radial-gradient(circle at top, rgba(255, 245, 222, 0.55), transparent 30%),
+    linear-gradient(180deg, var(--page-bg-top), var(--page-bg-bottom));
+}
+
+a {
+  color: inherit;
+}
+
+.section-shell {
+  width: min(100% - 2rem, 960px);
+  margin: 0 auto;
+}
+
+.section-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  justify-content: space-between;
+  padding-top: 1.4rem;
+}
+
+.topbar-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.topbar-links a {
+  text-decoration: none;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid rgba(56, 31, 17, 0.25);
+}
+
+main.section-shell {
+  min-height: calc(100vh - 4.5rem);
+  display: grid;
+  place-items: center;
+  padding: 2rem 0 4rem;
+}
+
+.section-card {
+  width: 100%;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border-radius: 1.6rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-line);
+  box-shadow: 0 1.5rem 3rem rgba(58, 33, 20, 0.14);
+  backdrop-filter: blur(14px);
+}
+
+.section-kicker {
+  margin: 0 0 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.82rem;
+  color: rgba(74, 42, 24, 0.72);
+}
+
+h1 {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(3rem, 8vw, 5.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.section-intro,
+.section-card p,
+.section-list {
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+
+.section-intro {
+  margin: 1rem 0 1.35rem;
+  max-width: 46rem;
+}
+
+.section-list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.section-list li + li {
+  margin-top: 0.8rem;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+}
+
+.section-actions a {
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--accent), #4e1014);
+  color: #fff7ee;
+  padding: 0.85rem 1.1rem;
+  border-radius: 999px;
+  box-shadow: 0 0.8rem 1.8rem rgba(54, 18, 19, 0.18);
+}
+
+.section-actions a.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(87, 53, 28, 0.2);
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .section-shell {
+    width: min(100% - 1rem, 960px);
+  }
+
+  .section-topbar {
+    justify-content: flex-start;
+  }
+}

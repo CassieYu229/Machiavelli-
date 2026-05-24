@@ -52,8 +52,55 @@ Index · HTML
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .fortuna-entry {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1200;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 0.9rem 1rem;
+      text-decoration: none;
+      color: #f7eee0;
+      background: linear-gradient(135deg, rgba(121, 28, 30, 0.9), rgba(54, 11, 16, 0.94));
+      border: 1px solid rgba(242, 210, 162, 0.24);
+      box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(10px);
+    }
+
+    .fortuna-entry strong {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .fortuna-entry span {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.82;
+    }
+
+    @media (max-width: 640px) {
+      .fortuna-entry {
+        top: auto;
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        padding: 0.8rem 0.9rem;
+      }
+    }
+  </style>
 </head>
 <body>
+
+  <a class="fortuna-entry" href="wheel.html">
+    <span>Dedicated Wheel Page</span>
+    <strong>Lady Fortuna</strong>
+  </a>
 
   <div id="bg-wrap">
     <div id="bg-img"></div>
