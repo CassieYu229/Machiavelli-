@@ -58,8 +58,22 @@
   });
 
   if (wheelFrame && !prefersReducedMotion) {
+    let isHoveringLink = false;
+
     const updateTilt = (event) => {
+      if (isHoveringLink) return;
+
       const bounds = wheelFrame.getBoundingClientRect();
+      const centerX = bounds.left + bounds.width / 2;
+      const centerY = bounds.top + bounds.height / 2;
+      const distFromCenter = Math.sqrt(
+        Math.pow(event.clientX - centerX, 2) + Math.pow(event.clientY - centerY, 2)
+      );
+
+      // Don't tilt if cursor is near the center (roughly the hub area)
+      const hubRadius = bounds.width * 0.15;
+      if (distFromCenter < hubRadius) return;
+
       const offsetX = (event.clientX - bounds.left) / bounds.width - 0.5;
       const offsetY = (event.clientY - bounds.top) / bounds.height - 0.5;
       const tiltX = offsetY * -4.8;
@@ -73,6 +87,17 @@
       wheelFrame.style.setProperty("--tilt-x", "0deg");
       wheelFrame.style.setProperty("--tilt-y", "0deg");
     };
+
+    orbitLinks.forEach((link) => {
+      link.addEventListener("mouseenter", () => {
+        isHoveringLink = true;
+        resetTilt();
+      });
+
+      link.addEventListener("mouseleave", () => {
+        isHoveringLink = false;
+      });
+    });
 
     wheelFrame.addEventListener("pointermove", updateTilt);
     wheelFrame.addEventListener("pointerleave", resetTilt);

@@ -3,39 +3,766 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Prince | Machiavelli</title>
+  <title>The Prince | Machiavelli E-Reader</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Spectral:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="section-page.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=EB+Garamond:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: "EB Garamond", "Libre Caslon", Georgia, serif;
+      background-color: #fdfbf7;
+      background-image: 
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.5) 2px, rgba(255, 255, 255, 0.5) 4px),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.3) 2px, rgba(255, 255, 255, 0.3) 4px);
+      background-size: 4px 4px;
+      background-attachment: fixed;
+      color: #2a2421;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .reader-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: linear-gradient(180deg, rgba(253, 251, 247, 0.98) 0%, rgba(253, 251, 247, 0.95) 100%);
+      border-bottom: 2px solid #d4af37;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(8px);
+      transition: transform 0.3s ease;
+      transform: translateY(0);
+    }
+
+    .reader-header.hidden {
+      transform: translateY(-100%);
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .header-back {
+      font-family: "Cinzel", serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: #6b4f33;
+      text-decoration: none;
+      text-transform: uppercase;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #d4af37;
+      border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+
+    .header-back:hover {
+      color: #d4af37;
+      background-color: rgba(212, 175, 55, 0.1);
+    }
+
+    .header-title {
+      font-family: "Cinzel", serif;
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      color: #2a2421;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .header-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .header-btn {
+      font-family: "Cinzel", serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: #6b4f33;
+      background: none;
+      border: 1px solid #d4af37;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+    }
+
+    .header-btn:hover {
+      color: #d4af37;
+      background-color: rgba(212, 175, 55, 0.1);
+    }
+
+    /* Sidebar TOC */
+    .reader-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: #fdfbf7;
+      border-right: 3px double #d4af37;
+      z-index: 40;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      padding: 5.5rem 1.5rem 80px;
+    }
+
+    .reader-sidebar.visible {
+      transform: translateX(0);
+    }
+
+    .toc-title {
+      font-family: "Cinzel", serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #8b0000;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .toc-chapter {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc-chapter-btn {
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      font-family: "EB Garamond", Georgia, serif;
+      font-size: 0.9rem;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-left: 3px solid transparent;
+      color: #2a2421;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .toc-chapter-btn:hover {
+      border-left-color: #d4af37;
+      background: rgba(212, 175, 55, 0.15);
+    }
+
+    .toc-chapter-btn.active {
+      background: rgba(212, 175, 55, 0.25);
+      border-left-color: #8b0000;
+      color: #8b0000;
+      font-weight: 600;
+    }
+
+    /* Main Reader */
+    .reader-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      margin-top: 4.5rem;
+      margin-bottom: 80px;
+    }
+
+    .reading-canvas {
+      width: 100%;
+      height: 100%;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+    }
+
+    .reading-canvas::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .reading-canvas::-webkit-scrollbar-track {
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .reading-canvas::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 3px;
+    }
+
+    .reading-canvas::-webkit-scrollbar-thumb:hover {
+      background: #c9a827;
+    }
+
+    .page-column {
+      flex: 0 0 100%;
+      height: 100%;
+      padding: 3rem 4rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+
+    .page-content {
+      max-width: 65ch;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border: 2px double #d4af37;
+      border-width: 2px 0px;
+      padding: 2rem 0;
+    }
+
+    .chapter-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .chapter-number {
+      font-family: "Cinzel", serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: #8b0000;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .chapter-title {
+      font-family: "Cinzel", serif;
+      font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #2a2421;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+
+    .page-text {
+      font-family: "EB Garamond", "Libre Caslon", Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.85;
+      color: #2a2421;
+      text-align: justify;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .page-text p {
+      margin-bottom: 1.2rem;
+    }
+
+    .page-text p:first-letter {
+      font-family: "Cinzel", serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #8b0000;
+      float: left;
+      line-height: 1;
+      padding-right: 0.3rem;
+      margin-top: -0.05em;
+    }
+
+    .page-text p:first-of-type::first-letter {
+      font-size: 3.4rem;
+    }
+
+    .page-text em {
+      font-style: italic;
+      color: #4f341f;
+    }
+
+    .page-text strong {
+      font-weight: 700;
+      color: #8b0000;
+    }
+
+    /* Interaction Zones */
+    .interaction-zones {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .zone-prev,
+    .zone-next,
+    .zone-menu {
+      position: absolute;
+      height: 100%;
+      top: 0;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .zone-prev {
+      left: 0;
+      width: 20%;
+    }
+
+    .zone-menu {
+      left: 20%;
+      width: 60%;
+    }
+
+    .zone-next {
+      right: 0;
+      width: 20%;
+    }
+
+    /* Footer Progress */
+    .reader-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(180deg, rgba(253, 251, 247, 0.95) 0%, rgba(253, 251, 247, 0.99) 100%);
+      border-top: 2px solid #d4af37;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      gap: 0.8rem;
+      transition: transform 0.3s ease;
+      transform: translateY(0);
+    }
+
+    .reader-footer.hidden {
+      transform: translateY(100%);
+    }
+
+    .progress-bar {
+      width: 90%;
+      max-width: 500px;
+      height: 3px;
+      background: rgba(212, 175, 55, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8b0000, #d4af37);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-family: "Cinzel", serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: #6b4f33;
+      text-transform: uppercase;
+    }
+
+    /* Navigation Arrows */
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      color: rgba(212, 175, 55, 0.6);
+      cursor: pointer;
+      z-index: 35;
+      padding: 1rem;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .nav-arrow:hover {
+      color: #d4af37;
+      font-size: 2.4rem;
+    }
+
+    .nav-arrow.disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .nav-arrow-left {
+      left: 1rem;
+    }
+
+    .nav-arrow-right {
+      right: 1rem;
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+      position: fixed;
+      bottom: 100px;
+      right: 1.5rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: rgba(212, 175, 55, 0.4);
+      text-transform: uppercase;
+      text-align: right;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Chapter Navigation */
+    .chapter-nav {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .chapter-nav-btn {
+      font-family: "Cinzel", serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: #6b4f33;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 0.6rem 1rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+    }
+
+    .chapter-nav-btn:hover:not(:disabled) {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+
+    .chapter-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
-  <header class="section-shell section-topbar">
-    <strong>Machiavelli Archive</strong>
-    <div class="topbar-links">
-      <a href="wheel.html">Dedicated wheel page</a>
-      <a href="index.html">Original homepage</a>
+  <div class="reader-header">
+    <div class="header-controls">
+      <a href="index.html" class="header-back">← Home</a>
     </div>
-  </header>
+    <div class="header-title">Niccolò Machiavelli • The Prince</div>
+    <div class="header-btns">
+      <button class="header-btn" id="tocBtn">☰ Table of Contents</button>
+      <button class="header-btn" id="zenBtn">Focus Mode</button>
+    </div>
+  </div>
 
-  <main class="section-shell">
-    <section class="section-card">
-      <p class="section-kicker">Treatise</p>
-      <h1>The Prince</h1>
-      <p class="section-intro">
-        This page is ready for an introduction, chapter highlights, or a guided pathway into Machiavelli's
-        most famous and most debated work.
-      </p>
-      <ul class="section-list">
-        <li>Frame the work historically and explain the dedication.</li>
-        <li>Pull out a few key chapters for first-time readers.</li>
-        <li>Use this page as the gateway to power, prudence, and fortune.</li>
-      </ul>
-      <div class="section-actions">
-        <a href="wheel.html">Dedicated wheel page</a>
-        <a class="secondary" href="index.html">Original homepage</a>
-      </div>
-    </section>
-  </main>
+  <div class="reader-sidebar" id="readerSidebar">
+    <div class="toc-title">Table of Contents</div>
+    <div id="tocContainer"></div>
+  </div>
+
+  <div class="reader-container">
+    <div class="nav-arrow nav-arrow-left" id="navArrowLeft">‹</div>
+    <div class="nav-arrow nav-arrow-right" id="navArrowRight">›</div>
+    
+    <div class="reading-canvas" id="readingCanvas">
+      <!-- Pages will be generated here -->
+    </div>
+    
+    <div class="scroll-indicator" id="scrollIndicator">
+      Scroll →
+    </div>
+
+    <div class="interaction-zones">
+      <div class="zone-prev" id="zonePrev"></div>
+      <div class="zone-menu" id="zoneMenu"></div>
+      <div class="zone-next" id="zoneNext"></div>
+    </div>
+  </div>
+
+  <div class="reader-footer" id="readerFooter">
+    <div class="progress-bar">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+    <div class="progress-text">
+      Chapter <span id="currentChapter">1</span> • <span id="chapterTitle">On Principalities and the Ways to Acquire Them</span>
+    </div>
+  </div>
+
+  <script>
+    const chapters = [
+      {
+        number: 1,
+        title: "On Principalities and the Ways to Acquire Them",
+        content: `All states, all dominions that hold or have held sway over mankind are either republics or monarchies. Monarchies are either hereditary, in which the family has been ruling for generations, or they are new. New monarchies are either entirely new, as was Milan under Francesco Sforza, or they are additions to existing territories, as when the Kingdom of Naples was added to the domains of the King of Spain.
+
+States thus acquired are either accustomed to live under a prince or accustomed to freedom. They are acquired either by the arms of him who rules, or by the arms of others, either by good fortune or by ability.
+
+I will leave aside discussions of republics, since I have treated them at length elsewhere. I shall concentrate on monarchies. Let me examine how the aforementioned princes may govern and maintain themselves.
+
+The difficulty of maintaining a new state lies in this: a prince who is new to rule lacks the reputation and resources of one who has long been established. Yet if he is virtuous and capable, he may overcome these obstacles and establish himself firmly upon his throne.
+
+A new prince finds favor or suspicion among his subjects according to his actions. Those who acquire a state by virtue are far more easily accepted than those who acquire it by fortune alone. For virtue suggests capacity and wisdom, while fortune suggests whimsy and the changeable will of fate.`
+      },
+      {
+        number: 2,
+        title: "On Hereditary Principalities",
+        content: `Hereditary principalities require little discussion. A prince who inherits his dominion has the advantage of custom and the loyalty of those accustomed to his family's rule. The subjects are more easily content, having known no other master.
+
+Yet even in hereditary states, the prince must take care. He must not commit those errors that might undermine the affection of his people. He must be attentive to the welfare of his subjects and mindful of their concerns.
+
+The natural hatred that subjects bear toward a new prince is replaced, in hereditary succession, by a natural affection. For people naturally love that which they have known from their birth. A wise prince will preserve this natural advantage.
+
+However, let the prince beware: even this advantage may be lost through negligence or cruelty. The history of kingdoms is strewn with examples of princes who, through their vices, forfeited the love of their subjects and brought ruin upon themselves and their states.
+
+Therefore, the hereditary prince must study diligently the deeds of his ancestors and understand why certain actions pleased or displeased his subjects. In this way, he may learn the art of ruling without the trials that beset the new prince.`
+      },
+      {
+        number: 3,
+        title: "On Mixed Principalities",
+        content: `A mixed principality is one recently acquired, added to the dominions of a prince who already rules in another place. The difficulties are considerable. Those who live in the newly acquired territory will compare their condition with that which they enjoyed under their former rulers.
+
+If they were freer under the previous regime, they will resent the new prince. If they were oppressed, they may initially welcome the change. But the new prince must be vigilant, for affection easily turns to disaffection if he appears weaker or less competent than his predecessor.
+
+The best course for a prince acquiring new territories is to establish himself in person among his new subjects. By his presence, he demonstrates his commitment to their welfare. By his actions, he shows himself either just or, when necessity demands, appropriately severe.
+
+Let the new prince not hesitate to make examples of those who foment rebellion or disorder. The cost of one act of severity, when undertaken early and decisively, is far less than the cost of civil strife that results from excessive leniency.
+
+The prince must also consider the customs of the conquered peoples. Where customs differ from his own, he must decide whether to preserve them or impose his own. In general, it is wise to preserve the customs of a conquered state, unless those customs directly threaten the prince's authority.`
+      },
+      {
+        number: 4,
+        title: "Why the Kingdom of Darius Was Not Rebellious After Alexander Conquered It",
+        content: `When Alexander the Great conquered the kingdom of Darius III, one might have expected the kingdom to rebel against him after his death. Yet it remained loyal to his successors for many years. Why?
+
+The answer lies in the nature of the state. Darius ruled as a despot, with power concentrated in his own hands and his most trusted advisors. The people were accustomed to obedience and discipline. When Alexander conquered them, he maintained this structure, replacing only the monarch at the apex.
+
+Therefore, when a prince conquers a state that is accustomed to obedience and centralized rule, the conquest is easily maintained. The subjects know no other form of governance.
+
+Contrast this with a republic, where power is distributed among many citizens. To conquer such a state is easy; to hold it is difficult. For the people are accustomed to freedom and participation in governance. They will rebel against any prince who attempts to rule them as a despot.
+
+This principle holds true in all cases: the nature of a state determines both the ease of conquest and the difficulty of holding it. A wise prince will understand this and govern accordingly.`
+      },
+      {
+        number: 5,
+        title: "How to Govern Cities or Principalities That, Before Being Occupied, Lived Under Their Own Laws",
+        content: `When a city has been accustomed to living under its own laws and enjoying freedom, there are three ways to hold it securely.
+
+First, destroy it utterly. This is certain but cruel. A destroyed city cannot rebel.
+
+Second, take up residence there yourself. Your presence ensures order and your authority is immediate. You can see and respond to threats in real time.
+
+Third, allow the city to maintain its own laws and its own government, but place it under tribute. This way, the city continues to function, generating wealth that you may tax. The citizens retain some sense of autonomy, which mollifies their resistance.
+
+Of these three, the second is most effective if you possess the resources to maintain a court in the conquered city. However, if you cannot be present in person, the third option is preferable to the first, for a living, productive city is of greater value than a ruin.
+
+If you choose the third path, you must place in the city a small garrison and a governor of your own choosing. These ensure that rebellion is difficult and easily suppressed. The garrison need not be large; its presence alone is often sufficient to discourage insurrection.`
+      },
+      {
+        number: 6,
+        title: "Of New Principalities Acquired by One's Own Arms and Ability",
+        content: `Those princes who acquire their dominions through their own virtue and ability face great difficulty in maintaining them. The climb is steep because they have no established position upon which to rest.
+
+Yet those who succeed in establishing themselves through their own effort often prove to be the most enduring rulers. For they understand the difficulties of rule intimately; they have overcome them once and can overcome them again.
+
+Consider the examples of Moses, Cyrus the Great, Romulus, and Theseus. Each of these men arose from obscurity and founded great kingdoms through their own valor and wisdom. Yet each succeeded not by fortune alone, but by virtue: by understanding the needs of their people and providing the governance and justice that the people required.
+
+A prince who acquires his state through his own arms must accomplish several things: he must break the power of those who opposed him; he must win the support of the people; he must maintain their affection through wise governance; and he must defend against external threats.
+
+This is a difficult path, but those who follow it successfully create the strongest states. For a state created by the effort of one man is often stronger than a state that has been handed down through generations of inheritance. The creator understands the foundations and can reinforce them against decay.`
+      },
+      {
+        number: 7,
+        title: "Of New Principalities Acquired by Others' Arms and by Fortune",
+        content: `Those princes who acquire their dominions through the arms of others and through good fortune find themselves in a precarious position. They have not earned their rule through their own effort, and the people do not regard them with the same respect as they would a prince of virtue.
+
+There are two ways such a prince acquires his state. First, he may be elevated to power by the Great Powers that surround him, who find it convenient to have a dependable ally in a particular location. Second, he may be elevated through pure fortune, through the death of the previous ruler or through some fortuitous circumstance.
+
+In the first case, the prince depends entirely upon the continued goodwill of the power that elevated him. Should that power withdraw its support, the prince's rule collapses. Therefore, the prince must maintain his position through constant attention to the interests of his patron.
+
+In the second case, the prince is almost entirely dependent upon the maintenance of the fortuitous circumstances that brought him to power. If those circumstances change, his rule is threatened.
+
+The dangers that face such a prince are numerous. The people regard him as a tool of foreign power rather than as their rightful sovereign. Nobles who might have hoped for power themselves regard him with suspicion. And his dependence upon others leaves him unable to act freely in the interests of his state.
+
+Yet a prudent prince in such a position may improve his lot through wise governance and through strategic maneuvering to increase his independence. By winning the affection of his people through justice and good rule, he may gradually solidify his position. By carefully managing his relations with his patron, he may gradually increase his autonomy.`
+      }
+    ];
+
+    let currentChapterIndex = 0;
+    let isZenMode = false;
+    let headerVisible = true;
+
+    const readingCanvas = document.getElementById('readingCanvas');
+    const readerHeader = document.querySelector('.reader-header');
+    const readerFooter = document.querySelector('.reader-footer');
+    const readerSidebar = document.getElementById('readerSidebar');
+    const tocContainer = document.getElementById('tocContainer');
+    const currentChapterSpan = document.getElementById('currentChapter');
+    const chapterTitleSpan = document.getElementById('chapterTitle');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const tocBtn = document.getElementById('tocBtn');
+    const zenBtn = document.getElementById('zenBtn');
+    const zonePrev = document.getElementById('zonePrev');
+    const zoneNext = document.getElementById('zoneNext');
+    const zoneMenu = document.getElementById('zoneMenu');
+    const navArrowLeft = document.getElementById('navArrowLeft');
+    const navArrowRight = document.getElementById('navArrowRight');
+    const scrollIndicator = document.getElementById('scrollIndicator');
+
+    // Populate TOC
+    function populateTOC() {
+      chapters.forEach((ch, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'toc-chapter-btn';
+        if (idx === 0) btn.classList.add('active');
+        btn.textContent = `Chapter ${ch.number}: ${ch.title}`;
+        btn.addEventListener('click', () => goToChapter(idx));
+        tocContainer.appendChild(btn);
+      });
+    }
+
+    function renderChapter(chapterIndex) {
+      readingCanvas.innerHTML = '';
+      const chapter = chapters[chapterIndex];
+
+      const page = document.createElement('div');
+      page.className = 'page-column';
+
+      const pageContent = document.createElement('div');
+      pageContent.className = 'page-content';
+
+      let html = `
+        <div class="chapter-header">
+          <div class="chapter-number">Chapter ${chapter.number}</div>
+          <h1 class="chapter-title">${chapter.title}</h1>
+        </div>
+        <div class="page-text">
+      `;
+
+      const paragraphs = chapter.content.split('\n\n');
+      paragraphs.forEach(para => {
+        if (para.trim()) {
+          html += `<p>${para.trim()}</p>`;
+        }
+      });
+
+      html += `</div>`;
+
+      // Add chapter navigation buttons
+      html += `
+        <div class="chapter-nav">
+          <button class="chapter-nav-btn" id="navBtnPrev" ${chapterIndex === 0 ? 'disabled' : ''}>
+            ← Previous Chapter
+          </button>
+          <button class="chapter-nav-btn" id="navBtnNext" ${chapterIndex === chapters.length - 1 ? 'disabled' : ''}>
+            Next Chapter →
+          </button>
+        </div>
+      `;
+
+      pageContent.innerHTML = html;
+      page.appendChild(pageContent);
+      readingCanvas.appendChild(page);
+
+      // Attach click handlers to chapter nav buttons
+      const navBtnPrev = document.getElementById('navBtnPrev');
+      const navBtnNext = document.getElementById('navBtnNext');
+      if (navBtnPrev) navBtnPrev.addEventListener('click', prevChapter);
+      if (navBtnNext) navBtnNext.addEventListener('click', nextChapter);
+
+      currentChapterIndex = chapterIndex;
+      updateProgress();
+      updateTOC();
+      updateNavArrows();
+    }
+
+    function goToChapter(index) {
+      renderChapter(index);
+      readerSidebar.classList.remove('visible');
+      readingCanvas.scrollLeft = 0;
+    }
+
+    function updateProgress() {
+      currentChapterSpan.textContent = chapters[currentChapterIndex].number;
+      chapterTitleSpan.textContent = chapters[currentChapterIndex].title;
+      const progress = ((currentChapterIndex + 1) / chapters.length) * 100;
+      progressBarFill.style.width = progress + '%';
+    }
+
+    function updateTOC() {
+      document.querySelectorAll('.toc-chapter-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === currentChapterIndex);
+      });
+    }
+
+    function updateNavArrows() {
+      navArrowLeft.classList.toggle('disabled', currentChapterIndex === 0);
+      navArrowRight.classList.toggle('disabled', currentChapterIndex === chapters.length - 1);
+    }
+
+    function toggleTOC() {
+      readerSidebar.classList.toggle('visible');
+    }
+
+    function toggleZenMode() {
+      isZenMode = !isZenMode;
+      readerHeader.classList.toggle('hidden');
+      readerFooter.classList.toggle('hidden');
+      zenBtn.style.backgroundColor = isZenMode ? 'rgba(212, 175, 55, 0.2)' : 'transparent';
+    }
+
+    function nextChapter() {
+      if (currentChapterIndex < chapters.length - 1) {
+        goToChapter(currentChapterIndex + 1);
+      }
+    }
+
+    function prevChapter() {
+      if (currentChapterIndex > 0) {
+        goToChapter(currentChapterIndex - 1);
+      }
+    }
+
+    // Event listeners
+    tocBtn.addEventListener('click', toggleTOC);
+    zenBtn.addEventListener('click', toggleZenMode);
+    zoneNext.addEventListener('click', nextChapter);
+    zonePrev.addEventListener('click', prevChapter);
+    zoneMenu.addEventListener('click', toggleTOC);
+    navArrowLeft.addEventListener('click', prevChapter);
+    navArrowRight.addEventListener('click', nextChapter);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextChapter();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevChapter();
+      }
+    });
+
+    // Initialize
+    populateTOC();
+    renderChapter(0);
+  </script>
 </body>
 </html>
