@@ -1,466 +1,147 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Machiavelli</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;500;600;700&family=IM+Fell+English+SC&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: "Cormorant Garamond", Georgia, serif;
-      background: 
-        radial-gradient(circle at center, rgba(0, 0, 0, 0) 18%, rgba(14, 6, 5, 0.4) 58%, rgba(4, 2, 2, 0.9) 100%),
-        radial-gradient(circle at top, rgba(80, 43, 29, 0.18), transparent 28%),
-        linear-gradient(180deg, #170b09 0%, #0d0404 100%);
-      background-attachment: fixed;
-      color: #f7f0e2;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    .fortuna-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .fortuna-bg img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      opacity: 0.9;
-    }
-
-    .container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .wheel-wrapper {
-      position: relative;
-      width: min(95vw, 850px);
-      aspect-ratio: 1;
-    }
-
-    svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
-    }
-
-    .wheel-segment {
-      transition: fill 0.25s ease, stroke 0.25s ease, filter 0.25s ease;
-      cursor: pointer;
-      filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
-    }
-
-    .wheel-segment:hover {
-      filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
-    }
-
-    .segment-separator {
-      transition: stroke 0.25s ease, stroke-width 0.25s ease, opacity 0.25s ease;
-      pointer-events: none;
-    }
-
-    .wheel-segment:hover ~ .segment-separator,
-    .wheel-segment:hover .segment-separator {
-      stroke-width: 1.8;
-      opacity: 0.4;
-    }
-
-    .segment-text {
-      pointer-events: none;
-      transition: fill 0.25s ease, text-shadow 0.25s ease;
-    }
-
-    .segment-title {
-      font-family: "Cinzel", serif;
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      fill: rgba(229, 214, 188, 0.88);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    }
-
-    .segment-subtitle {
-      font-family: "Cormorant Garamond", Georgia, serif;
-      font-size: 0.75rem;
-      font-style: italic;
-      letter-spacing: 0.06em;
-      fill: rgba(200, 180, 150, 0.78);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-    }
-
-    .segment-icon {
-      font-size: 1.8rem;
-      fill: rgba(220, 190, 150, 0.8);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    }
-
-    .wheel-segment:hover .segment-title {
-      fill: rgba(255, 245, 225, 0.98);
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(255, 217, 141, 0.2);
-    }
-
-    .wheel-segment:hover .segment-subtitle {
-      fill: rgba(230, 210, 180, 0.92);
-    }
-
-    .wheel-segment:hover .segment-icon {
-      fill: rgba(255, 230, 180, 0.95);
-    }
-
-    .center-medallion {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10;
-      width: 24%;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: 
-        radial-gradient(circle at 34% 28%, #d4b896 0%, #9d7d58 38%, #6b4f33 68%, #3d2719 100%);
-      border: 2px solid #c9a86a;
-      box-shadow: 
-        inset 0 0 0 1px rgba(255, 250, 225, 0.12),
-        0 1rem 2rem rgba(0, 0, 0, 0.25),
-        inset 0 2px 6px rgba(255, 255, 255, 0.06),
-        inset 0 -2px 8px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      pointer-events: none;
-      will-change: auto;
-    }
-
-    .center-compass {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      opacity: 0.15;
-      background: 
-        conic-gradient(from 0deg, transparent 0deg 45deg, rgba(180, 140, 90, 0.3) 45deg 46deg, transparent 46deg 90deg, 
-                       rgba(180, 140, 90, 0.3) 90deg 91deg, transparent 91deg 135deg,
-                       rgba(180, 140, 90, 0.3) 135deg 136deg, transparent 136deg 180deg);
-      pointer-events: none;
-    }
-
-    .center-text {
-      font-family: "Cinzel", serif;
-      font-size: clamp(0.95rem, 1.2vw, 1.2rem);
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      color: #fef5e7;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-      margin: 0;
-      position: relative;
-      z-index: 2;
-    }
-
-    .center-subtext {
-      font-family: "Cormorant Garamond", Georgia, serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(200, 175, 140, 0.85);
-      margin-top: 0.4rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .top-nav {
-      position: fixed;
-      top: 1.5rem;
-      right: 2rem;
-      z-index: 100;
-      padding: 0;
-      border: none;
-    }
-
-    .top-nav a {
-      font-family: "Cinzel", serif;
-      font-size: 0.9rem;
-      letter-spacing: 0.12em;
-      color: #fef5e7;
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color 0.25s ease, text-shadow 0.25s ease;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-      padding: 0.5rem 1rem;
-      border: 1px solid rgba(254, 245, 231, 0.3);
-      border-radius: 2px;
-      display: inline-block;
-    }
-
-    .top-nav a:hover {
-      color: #d4b896;
-      border-color: rgba(212, 184, 150, 0.6);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 8px rgba(255, 217, 141, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      .segment-title {
-        font-size: 0.95rem;
-      }
-
-      .segment-subtitle {
-        font-size: 0.65rem;
-      }
-
-      .segment-icon {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Machiavelli Project</title>
+<link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <div class="top-nav">
-    <a href="about.html">About</a>
-  </div>
 
-  <div class="fortuna-bg">
-    <img src="ladyfortuna.png" alt="Lady Fortuna" />
-  </div>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <div class="brand">The Machiavelli Project</div>
+      <nav class="site-nav">
+        <a href="#works" class="is-active">Tab 1</a>
+        <a href="#letters">Tab 2</a>
+        <a href="#about">Tab 3</a>
+      </nav>
+    </div>
+    <div class="wrap">
+      <p class="eyebrow">Short quotes from Machiavelli — TEXT: replace with a rotating quote if useful.</p>
+    </div>
+  </header>
 
-  <div class="container">
-    <div class="wheel-wrapper">
-      <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="wheelHalo" cx="50%" cy="44%" r="72%">
-            <stop offset="0%" stop-color="rgba(150, 114, 73, 0.16)" />
-            <stop offset="64%" stop-color="rgba(82, 57, 36, 0.14)" />
-            <stop offset="100%" stop-color="rgba(24, 11, 9, 0.02)" />
-          </radialGradient>
-          <linearGradient id="rimGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#927353" />
-            <stop offset="26%" stop-color="#6f5339" />
-            <stop offset="56%" stop-color="#4f341f" />
-            <stop offset="82%" stop-color="#846649" />
-            <stop offset="100%" stop-color="#3d2719" />
-          </linearGradient>
-          <linearGradient id="sliceGradient0" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="rgba(110, 54, 45, 0.96)" />
-            <stop offset="50%" stop-color="rgba(84, 43, 33, 0.97)" />
-            <stop offset="100%" stop-color="rgba(55, 27, 19, 0.99)" />
-          </linearGradient>
-          <linearGradient id="sliceGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="rgba(112, 56, 47, 0.96)" />
-            <stop offset="50%" stop-color="rgba(86, 45, 35, 0.97)" />
-            <stop offset="100%" stop-color="rgba(57, 29, 21, 0.99)" />
-          </linearGradient>
-          <linearGradient id="sliceActiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="rgba(150, 95, 70, 0.99)" />
-            <stop offset="52%" stop-color="rgba(120, 68, 48, 0.99)" />
-            <stop offset="100%" stop-color="rgba(80, 40, 28, 1)" />
-          </linearGradient>
-          <linearGradient id="segmentWash" x1="50%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stop-color="rgba(244, 229, 200, 0.1)" />
-            <stop offset="42%" stop-color="rgba(255,255,255,0.02)" />
-            <stop offset="100%" stop-color="rgba(17, 7, 6, 0.18)" />
-          </linearGradient>
-          <filter id="sliceShadow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="rgba(0,0,0,0.28)" />
-          </filter>
-          <clipPath id="wheelClip">
-            <circle cx="500" cy="500" r="392" />
-          </clipPath>
-        </defs>
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <p class="eyebrow-label">Digital archive</p>
+      <h1><!-- TEXT: title --> Niccolò Machiavelli</h1>
+      <p class="lede">
+        <!-- TEXT: project intro copy goes here -->
+        Short description of the project — we cover 3 major works.
+      </p>
 
-        <circle cx="500" cy="500" r="420" fill="url(#wheelHalo)" opacity="0.48" />
-        <circle cx="500" cy="500" r="410" fill="none" stroke="url(#rimGradient)" stroke-width="24" opacity="0.96" />
-        <circle cx="500" cy="500" r="384" fill="none" stroke="rgba(207,183,146,0.16)" stroke-width="1.2" />
-
-        <g clip-path="url(#wheelClip)">
-          <circle cx="500" cy="500" r="392" fill="rgba(78, 50, 34, 0.28)" />
-          <circle cx="500" cy="500" r="392" fill="rgba(243, 228, 200, 0.08)" />
-        </g>
-
-        <circle cx="500" cy="500" r="399" fill="none" stroke="rgba(206,184,148,0.1)" stroke-width="6" stroke-dasharray="1.6 15" />
-        <circle cx="500" cy="500" r="180" fill="rgba(24, 10, 9, 0.3)" stroke="rgba(198, 174, 140, 0.12)" stroke-width="1.3" />
-        <circle cx="500" cy="500" r="152" fill="rgba(21, 8, 7, 0.18)" />
-
-        <!-- Segments will be generated here -->
-        <g id="segments"></g>
-
-        <!-- Separators will be generated here -->
-        <g id="separators"></g>
-
-        <!-- Labels will be generated here -->
-        <g id="labels"></g>
-      </svg>
-
-      <div class="center-medallion">
-        <div class="center-compass"></div>
-        <div class="center-text">MACHIAVELLI</div>
-        <div class="center-subtext">Works and Ideas</div>
+      <div class="hero-stats-row">
+        <div class="stat">
+          <span class="num"><!-- TEXT --> 1469</span>
+          <span class="label">Born</span>
+        </div>
+        <div class="stat">
+          <span class="num"><!-- TEXT --> 1527</span>
+          <span class="label">Died</span>
+        </div>
+        <div class="stat" style="border-right:none;">
+          <span class="num"><!-- TEXT --> 3</span>
+          <span class="label">Major works</span>
+        </div>
+        <!-- IMAGE: hero portrait -> images/portrait.jpg -->
+        <div class="hero-image">
+          <img src="images/portrait.jpg" alt="Portrait of Machiavelli" onerror="this.replaceWith('image')">
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <script>
-    const navItems = [
-      { title: "Letters", subtitle: "Correspondence", icon: "✉", href: "correspondence.html" },
-      { title: "Medici", subtitle: "Patronage", icon: "⚜", href: "medici.html" },
-      { title: "Florence", subtitle: "The City", icon: "⛨", href: "florence.html" },
-      { title: "Machiavelli", subtitle: "Power", icon: "♛", href: "index.html" },
-      { title: "Discourses", subtitle: "Republics", icon: "📖", href: "texts.html" },
-      { title: "Mandrake", subtitle: "Comedy", icon: "🎭", href: "themandrake.html" },
-      { title: "The Prince", subtitle: "Power & Rule", icon: "⚔", href: "theprince.html" },
-      { title: "Readings", subtitle: "Further Study", icon: "📜", href: "readings.html" }
-    ];
+  <!-- ============ WORKS / "THE BOOKSHELF" ============ -->
+  <section class="section" id="works">
+    <div class="wrap">
+      <p class="section-label">The Bookshelf</p>
+      <h2 class="section-title">Works</h2>
 
-    function polarToCartesian(cx, cy, radius, angle) {
-      const radians = (angle - 90) * Math.PI / 180;
-      return {
-        x: cx + radius * Math.cos(radians),
-        y: cy + radius * Math.sin(radians)
-      };
-    }
+      <div class="works-grid">
 
-    function donutSlicePath(cx, cy, innerRadius, outerRadius, startAngle, endAngle) {
-      const outerStart = polarToCartesian(cx, cy, outerRadius, startAngle);
-      const outerEnd = polarToCartesian(cx, cy, outerRadius, endAngle);
-      const innerEnd = polarToCartesian(cx, cy, innerRadius, endAngle);
-      const innerStart = polarToCartesian(cx, cy, innerRadius, startAngle);
-      const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+        <article class="work-card">
+          <h3><!-- TEXT --> Reading 1</h3>
+          <p><!-- TEXT: description --> Description of this reading.</p>
+          <div class="meta">
+            <span>Chapters</span>
+            <span>Published 1532</span>
+          </div>
+          <a class="btn" href="#">Explore the text →</a>
+        </article>
 
-      return [
-        `M ${outerStart.x} ${outerStart.y}`,
-        `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${outerEnd.x} ${outerEnd.y}`,
-        `L ${innerEnd.x} ${innerEnd.y}`,
-        `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerStart.x} ${innerStart.y}`,
-        "Z"
-      ].join(" ");
-    }
+        <article class="work-card">
+          <h3><!-- TEXT --> Reading 2</h3>
+          <p><!-- TEXT: description --> Description of this reading.</p>
+          <div class="meta">
+            <span>Chapters</span>
+            <span>Published 1532</span>
+          </div>
+          <a class="btn" href="#">Explore the text →</a>
+        </article>
 
-    function createSegments() {
-      const sliceAngle = 360 / navItems.length;
-      const segmentsGroup = document.getElementById("segments");
-      const separatorsGroup = document.getElementById("separators");
-      const labelsGroup = document.getElementById("labels");
+        <article class="work-card">
+          <h3><!-- TEXT --> Reading 3</h3>
+          <p><!-- TEXT: description --> Description of this reading.</p>
+          <div class="meta">
+            <span>Chapters</span>
+            <span>Published 1532</span>
+          </div>
+          <a class="btn" href="#">Explore the text →</a>
+        </article>
 
-      navItems.forEach((item, index) => {
-        const startAngle = -110 + index * sliceAngle;
-        const endAngle = startAngle + sliceAngle;
-        const midAngle = startAngle + sliceAngle / 2;
-        const isAlternate = index % 2 === 1;
+        <article class="work-card" id="about">
+          <h3><!-- TEXT --> About Machiavelli</h3>
+          <p><!-- TEXT: bio blurb --> Short biography module.</p>
+          <a class="btn" href="#">Learn more →</a>
+        </article>
 
-        // Segment path
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", donutSlicePath(500, 500, 180, 410, startAngle, endAngle));
-        path.setAttribute("fill", isAlternate ? "url(#sliceGradient1)" : "url(#sliceGradient0)");
-        path.setAttribute("stroke", "rgba(154, 122, 92, 0.32)");
-        path.setAttribute("stroke-width", "1.5");
-        path.classList.add("wheel-segment");
-        path.dataset.index = index;
-        path.dataset.href = item.href;
+      </div>
+    </div>
+  </section>
 
-        path.addEventListener("mouseenter", (e) => {
-          e.target.setAttribute("fill", "url(#sliceActiveGradient)");
-          e.target.setAttribute("stroke", "rgba(207, 184, 144, 0.48)");
-          e.target.setAttribute("stroke-width", "2.2");
-          e.target.setAttribute("filter", "url(#sliceShadow)");
-        });
+  <!-- ============ SNIPPET / LETTERS ============ -->
+  <section class="snippet" id="letters">
+    <div class="wrap" style="display:contents;">
+      <div>
+        <h2>Small snippet of his letters</h2>
+      </div>
+      <div>
+        <p>
+          <!-- TEXT: letters intro / excerpt -->
+          Short description of this section.
+        </p>
+        <a class="btn" href="#">Read more about letters →</a>
+      </div>
+    </div>
+  </section>
 
-        path.addEventListener("mouseleave", (e) => {
-          e.target.setAttribute("fill", isAlternate ? "url(#sliceGradient1)" : "url(#sliceGradient0)");
-          e.target.setAttribute("stroke", "rgba(154, 122, 92, 0.32)");
-          e.target.setAttribute("stroke-width", "1.5");
-          e.target.removeAttribute("filter");
-        });
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-cols">
+        <div>
+          <h4>Resources</h4>
+          <p><!-- TEXT --> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div>
+          <h4>Resources</h4>
+          <p><!-- TEXT --> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div>
+          <h4>About</h4>
+          <p><!-- TEXT --> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      </div>
 
-        path.addEventListener("click", () => {
-          window.location.href = item.href;
-        });
+      <div class="footer-bottom">
+        © <span id="year"></span> The Machiavelli Project
+      </div>
+    </div>
+  </footer>
 
-        segmentsGroup.appendChild(path);
-
-        // Segment wash overlay
-        const wash = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        wash.setAttribute("d", donutSlicePath(500, 500, 180, 410, startAngle, endAngle));
-        wash.setAttribute("fill", "url(#segmentWash)");
-        wash.setAttribute("pointer-events", "none");
-        segmentsGroup.appendChild(wash);
-
-        // Separator line
-        const separator = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        const startPoint = polarToCartesian(500, 500, 410, startAngle);
-        separator.setAttribute("x1", "500");
-        separator.setAttribute("y1", "500");
-        separator.setAttribute("x2", startPoint.x);
-        separator.setAttribute("y2", startPoint.y);
-        separator.setAttribute("stroke", "rgba(194, 167, 132, 0.18)");
-        separator.setAttribute("stroke-width", "1.2");
-        separator.classList.add("segment-separator");
-        separatorsGroup.appendChild(separator);
-
-        // Text labels positioned at 70% radius
-        const labelRadius = 295;
-        const labelPoint = polarToCartesian(500, 500, labelRadius, midAngle);
-
-        // Icon
-        const iconText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        iconText.setAttribute("x", labelPoint.x);
-        iconText.setAttribute("y", labelPoint.y - 24);
-        iconText.setAttribute("class", "segment-text segment-icon");
-        iconText.setAttribute("text-anchor", "middle");
-        iconText.textContent = item.icon;
-        iconText.setAttribute("pointer-events", "none");
-        labelsGroup.appendChild(iconText);
-
-        // Title
-        const titleText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        titleText.setAttribute("x", labelPoint.x);
-        titleText.setAttribute("y", labelPoint.y - 4);
-        titleText.setAttribute("class", "segment-text segment-title");
-        titleText.setAttribute("text-anchor", "middle");
-        titleText.textContent = item.title;
-        titleText.setAttribute("pointer-events", "none");
-        labelsGroup.appendChild(titleText);
-
-        // Subtitle
-        const subtitleText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        subtitleText.setAttribute("x", labelPoint.x);
-        subtitleText.setAttribute("y", labelPoint.y + 16);
-        subtitleText.setAttribute("class", "segment-text segment-subtitle");
-        subtitleText.setAttribute("text-anchor", "middle");
-        subtitleText.textContent = item.subtitle;
-        subtitleText.setAttribute("pointer-events", "none");
-        labelsGroup.appendChild(subtitleText);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", createSegments);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
